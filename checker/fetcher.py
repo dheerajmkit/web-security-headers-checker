@@ -1,4 +1,4 @@
-"""Fetch response headers, following redirects and noting HTTPS upgrades."""
+"""Fetch response headers for a URL without following redirects."""
 
 import requests
 
@@ -6,19 +6,13 @@ TIMEOUT = 10
 
 
 def fetch(url):
-    """Follow redirects; return headers plus final URL and upgrade info."""
+    """Return a dict of response headers (and final URL/HTTPS notes in day 2)."""
     try:
-        resp = requests.get(url, timeout=TIMEOUT, allow_redirects=True)
+        resp = requests.get(url, timeout=TIMEOUT, allow_redirects=False)
     except requests.RequestException as exc:
         return {"url": url, "error": str(exc)}
-    final_url = resp.url
-    upgraded = (url.startswith("http://")
-                and final_url.startswith("https://"))
     return {
         "url": url,
-        "final_url": final_url,
-        "redirects": [r.url for r in resp.history],
-        "https_upgrade": upgraded,
         "status_code": resp.status_code,
         "headers": dict(resp.headers),
     }
