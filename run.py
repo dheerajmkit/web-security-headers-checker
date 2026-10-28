@@ -5,6 +5,7 @@ import sys
 from checker.fetcher import fetch
 from checker.checks import run_checks, grade
 from checker.cookies import check_cookies
+from checker.reporter import to_json, to_markdown
 
 
 def audit(url):
@@ -40,19 +41,37 @@ def print_result(result):
 
 def main(argv):
     targets = []
-    if len(argv) == 2:
-        targets = [argv[1]]
-    elif len(argv) == 3 and argv[1] == "--targets":
-        with open(argv[2]) as fh:
+    args = argv[1:]
+    json_out = markdown_out = None
+    rest = []
+    it = iter(args)
+    for a in it:
+        if a == "--json":
+            json_out = next(it, None)
+        elif a == "--markdown":
+            markdown_out = next(it, None)
+        else:
+            rest.append(a)
+    if len(rest) == 1:
+        targets = [rest[0]]
+    elif len(rest) == 2 and rest[0] == "--targets":
+        with open(rest[1]) as fh:
             targets = [line.strip() for line in fh
                        if line.strip() and not line.startswith("#")]
     else:
-        print("usage: python3 run.py <url> | --targets <file>")
+        print("usage: python3 run.py <url> | --targets <file> "
+              "[--json f] [--markdown f]")
         sys.exit(2)
     results = [audit(u) for u in targets]
     for r in results:
         print_result(r)
         print()
+    if json_out:
+        with open(json_out, "w") as fh:
+            fh.write(to_json(results[0] if len(results) == 1 else results))
+    if markdown_out:
+        with open(markdown_out, "w") as fh:
+            fh.write(to_markdown(results[0]))
 
 
 if __name__ == "__main__":

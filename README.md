@@ -22,7 +22,12 @@ Batch mode (one URL per line):
 python3 run.py --targets targets.txt
 ```
 
-Cookie checks run automatically on every target.
+Cookie checks, JSON/Markdown reports (day-2/day-3 features):
+
+```bash
+python3 run.py https://example.com --json report.json
+python3 run.py --targets targets.txt --markdown report.md
+```
 
 ## What it checks
 
@@ -31,4 +36,4 @@ Response headers: `Content-Security-Policy`, `Strict-Transport-Security`,
 `Permissions-Policy`. Cookies: `Secure`, `HttpOnly`, `SameSite`.
 
 Each check produces a finding (`header`, `status`, `detail`), and the overall
-result is graded A–F.
+result is graded A–F. See `docs/USAGE.md` for usage details.
